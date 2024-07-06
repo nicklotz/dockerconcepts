@@ -46,7 +46,7 @@ cd example-voting-app/
 3. Bring up the application.
 
 ```
-docker-compose up --detach
+docker compose up --detach
 ```
 
 4. Open the voting page in your browser at [http://localhost:5000](http://localhost:5000) or inspect it in your terminal.
