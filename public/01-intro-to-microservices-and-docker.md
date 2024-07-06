@@ -31,56 +31,70 @@ docker run hello-world
 
 ## B. Deploy Sample Microservices App
 
-1. Clone a sample microservices app that deploys a local news application.
+1. Clone a sample microservices app that deploys a voting app.
 
 ```
-git clone https://github.com/rithinch/event-driven-microservices-docker-example.git
+git clone https://github.com/dockersamples/example-voting-app.git
 ```
 
 2. Change into the repo's parent directory.
 
 ```
-cd event-driven-microservices-docker-example/
+cd example-voting-app/
 ```
 
-3. Build the microservices app locally.
+3. Bring up the application.
 
 ```
-docker-compose build --no-cache
+docker-compose up --detach
 ```
 
-4. Bring up the application.
+4. Open the voting page in your browser at [http://localhost:5000](http://localhost:5000) or inspect it in your terminal.
 
 ```
-docker-compose up
+curl http://localhost:5000
 ```
 
-5. Get a list of articles maintained by the application.
+5. Open the results page in your browser at [http://localhost:5001](http://localhost:5001) or inspect it in your terminal.
 
 ```
-curl http://localhost:3000/api/articles
+curl http://localhost:5001
 ```
 
-6. Get the list of users in the application's user database.
-
-```
-http://localhost:3002/api/users
-```
-
-7. List all the running containers.
+6. List all the running containers.
 
 ```
 docker ps -a
 ```
 
-8. Show the application's container build configuration.
+7. Show the application's container build configuration.
 
 ```
 cat docker-compose.yml
 ```
 
-> If the `user-management` container for whatever reason went offline, can people still retrieve articles from the site? What does this say about the advantages of microservices?
+> If the the container that manages the voting page for whatever reason went offline, can people still view the results of the vote? What does this say about the advantages of microservices?
 
-9. Kill the user-management container.
+8. Stop the container that manages the voting page.
 
-10. Call the articles API.
+```
+docker stop $(docker ps -q --filter ancestor=example-voting-app-vote)
+```
+
+9. Attempt to access the voting page in your browser at [http://localhost:5000](http://localhost:5000) or in your terminal.
+
+```
+curl http://localhost:5000
+```
+
+10. Attempt to access the results page in your browser at [http://localhost:5001](http://localhost:5001) or in your terminal.
+
+```
+curl http://localhost:5001
+```
+
+12. Clean up deployment.
+
+```
+docker compose down
+```
