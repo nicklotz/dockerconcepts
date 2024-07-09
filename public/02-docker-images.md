@@ -101,7 +101,7 @@ docker stop testcontainer
 
 5. Launch a container from the newly saved image.
 ```
-docker run -d --name testcontainerv2 testimage:v2
+docker run -dit --name testcontainerv2 testimage:v2
 ```
 
 6. Inspect the container's filesystem.
