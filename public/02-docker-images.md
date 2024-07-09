@@ -5,6 +5,9 @@
 
 1. Pull an Ubuntu Linux image and connect to a shell session inside it.
 ```
+cd ~
+```
+```
 docker run -it --name testcontainer ubuntu /bin/bash
 ```
 
@@ -110,6 +113,11 @@ docker exec -it testcontainerv2 ls
 ```
 
 > Do the filesystem contents match that of the saved image?
+
+7. Stop the container.
+```
+docker stop testcontainerv2
+```
 
 ## D. Building From Dockerfile
 
