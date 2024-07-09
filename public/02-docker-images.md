@@ -67,9 +67,14 @@ docker history example-voting-app-vote
 docker run -d --name singleprocesscontainer ubuntu sleep infinity
 ```
 
-5. Explor the process running in the container.
+5. Explore the process running in the container.
 ```
 docker top singleprocesscontainer
+```
+
+6. Stop the running container.
+```
+docker stop singleprocesscontainer
 ```
 
 ## C. Build From an Existing Container
