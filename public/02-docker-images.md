@@ -1,6 +1,5 @@
 # Docker Images
 
-
 ## A. Image Immutability
 
 1. Pull an Ubuntu Linux image and connect to a shell session inside it.
@@ -157,4 +156,56 @@ docker image list
 docker image inspect mynginx
 ```
 
+## E. Multi-Stage Builds
 
+1. Create a new directory to hold the configuration for a simple web app.
+```
+cd ~
+```
+```
+mkdir mysimpleapp/
+```
+
+2. Change into the new configuration directory.
+```
+cd mysimpleapp/
+```
+
+3. Create a short and simple C++ program.
+```
+cat << EOF > main.cpp
+include <iostream>
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+EOF
+```
+
+4. Create a Dockerfile containing the configuration for a multi-stage build.
+```
+cat << EOF > Dockerfile
+# Build stage
+FROM gcc:latest as builder
+WORKDIR /app
+COPY main.cpp .
+RUN g++ -o main main.cpp
+
+# Final stage
+FROM alpine:latest
+COPY --from=builder /app/main /app/main
+CMD ["/app/main"]
+EOF
+```
+
+5. Build the Docker image.
+```
+docker build -t mysimpleapp .
+```
+
+6. Run the container, executing the program.
+```
+docker run mysimpleapp
+```
+
+## F. Docker Hub
