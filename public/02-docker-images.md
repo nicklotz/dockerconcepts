@@ -174,7 +174,7 @@ cd mysimpleapp/
 3. Create a short and simple C++ program.
 ```
 cat << EOF > main.cpp
-include <iostream>
+#include <iostream>
 int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
@@ -186,16 +186,15 @@ EOF
 ```
 cat << EOF > Dockerfile
 # Build stage
-FROM gcc:latest as builder
+FROM gcc:latest AS builder
 WORKDIR /app
 COPY main.cpp .
 RUN g++ -o main main.cpp
 
 # Final stage
-FROM alpine:latest
+FROM ubuntu:latest
 COPY --from=builder /app/main /app/main
 CMD ["/app/main"]
-EOF
 ```
 
 5. Build the Docker image.
