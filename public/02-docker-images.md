@@ -195,6 +195,7 @@ RUN g++ -o main main.cpp
 FROM ubuntu:latest
 COPY --from=builder /app/main /app/main
 CMD ["/app/main"]
+EOF
 ```
 
 5. Build the Docker image.
