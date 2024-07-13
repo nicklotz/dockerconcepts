@@ -209,3 +209,53 @@ docker run mysimpleapp
 ```
 
 ## F. Docker Hub
+
+1. Navigate to Docker Hub in your web browser.
+```
+https://hub.docker.com
+```
+
+2. Either **Sign In** to your existing account or **Sign Up** for a new account if needed.
+
+3. Once logged in, select your user file in the upper right corner, then click **Account Settings**. 
+
+4. Select the **Security** tab. Under **Access Tokens**, click **New Access Token**.
+
+5. Under **Access Token Description**, enter a description of your choice. Give the token **Read, Write, and Delete** permissions, then click **Generate**.
+
+6. In the window showing the generated credential, click **Copy and Close** to copy the token to your clipboard. Paste the token in a safe pace you can refer back to.
+
+7. Back in your terminal, authneticate to Docker Hub.
+```
+docker login
+```
+
+8. When prompted for a **Username**, enter your Docker ID or email address.
+
+9. When prompted for a **Password**, paste the token copied and saved in step 6.
+
+10. After logging in, run the following to verify Docker has locally stored a Docker Hub registry credential.
+```
+cat ~/.docker/config.json
+```
+
+> To upload a local Docker image to Docker Hub, the name must include the path in the registry where it will live.
+
+11. Run the following to create an environment variable for your Docker username. 
+```
+read -p "Enter your name [Richard]: " MY_DOCKER_USERNAME
+```
+
+12. Tag your local Docker image to include your Docker Username as well as an explicit version tag.
+```
+docker tag mysimpleapp $MY_DOCKER_USERNAME/mysimpleapp:0.0.1
+```
+
+13. Push to Docker Hub.
+```
+docker push $MY_DOCKER_USERNAME/mysimpleapp:0.0.1
+```
+
+14. In Docker Hub, navigate to **Repositories** and click into your **mysimpleapp** image repository. Click into the 0.0.1 image tag.
+
+> Do the image layesr resemble the image you pushed?
