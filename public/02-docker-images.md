@@ -258,7 +258,7 @@ docker push $MY_DOCKER_USERNAME/mysimpleapp:0.0.1
 
 14. In Docker Hub, navigate to **Repositories** and click into your **mysimpleapp** image repository. Click into the 0.0.1 image tag.
 
-> Do the image layesr resemble the image you pushed?
+> Do the image layers resemble the image you pushed?
 
 ## G. Clean Up
 
