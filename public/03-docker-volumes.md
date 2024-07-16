@@ -39,11 +39,58 @@ docker exec -it container2 bash -c "cat /isolation_test.txt"
 
 ## B. Port Mapping
 
-> Docker container also by default have their networks isolated from the underlying host.
+> Docker container also by default run on networks networks separate from the underlying host.
 
 1. Create a web service container from an NGINX image. 
 ```
 docker run -d --name webserver0 nginx
 ```
 
+2. Inspect the details of the running **webserver0** container.
+```
+docker inspect webserver0
+```
 
+> At the bottom of the output, what do you see regarding the container's networking configuration?
+
+3. Store the container IP address as a variable.
+```
+WEBSERVER0_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webserver0)
+```
+```
+echo $WEBSERVER_IP
+```
+
+4. Use **curl** to query the container's IP address. Alternatively, navigate to the container's IP address with your browser.
+```
+curl $WEBSERVER_IP
+```
+
+> While accessing Docker bridge network works from the Docker host machine, complications arise when you want the container to be accessible to computers outside host. One solution is to map container ports to host ports.
+
+5. Remove the existing **webserver0** container.
+
+```
+docker stop webserver0
+```
+```
+docker rm webserver0
+```
+
+6. Re-launch the **webserver0** container with a port mapping to the localhost.
+```
+docker run -d -p 8080:80 --name webserver0 nginx 
+```
+
+7. Open http://localhost:8080 in your browser or **curl** from the command line.
+```
+curl http://localhost:8080
+```
+
+8. Clean up the current container.
+```
+docker stop webserver0
+```
+```
+docker rm webserver0
+```
