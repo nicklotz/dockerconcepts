@@ -55,7 +55,7 @@ docker inspect webserver0
 
 3. Store the container IP address as a variable.
 ```
-WEBSERVER0_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webserver0)
+WEBSERVER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' webserver0)
 ```
 ```
 echo $WEBSERVER_IP
