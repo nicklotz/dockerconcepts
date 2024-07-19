@@ -1,4 +1,4 @@
-# Working with Docker Containers
+# Working with Docker Containers and Volumes
 
 ## A. Isolation
 
@@ -195,3 +195,57 @@ docker stop myenvvarapp
 ```
 docker rm myenvvarapp
 ```
+
+## D. Volumes
+
+> Docker volumes allow Docker to manage and store persistent data. They allow data to persist beyond the lifecycle of a single container, and can be even shared between containers. Docker volumes are essential for storing non-ephemeral data.
+
+1. Create a Docker volume to store persistent data.
+```
+docker volume create datavolume
+```
+
+2. Inspect the volume and its location on the Docker host.
+```
+docker volume inspect datavolume
+```
+
+3. Run a container that mounts the data volume.
+```
+docker run -d --name datatest1 -v datavolume:/app nginx
+```
+
+4. Write data to the container's **/app** directory.
+```
+docker exec -it datatest1 bash -c "echo 'Test write of persistent data' > /app/test.txt"
+```
+
+5. Stop and remove the **datatest1** container.
+```
+docker stop datatest1
+```
+```
+docker rm datatest1
+```
+
+6. Launch a second, new container instance, mounting the data volume.
+```
+docker run -d --name datatest2 -v datavolume:/app nginx
+```
+
+7. Check that the written data is in the new container's filesystem.
+```
+docker exec -it datatest2 cat /app/test.txt
+```
+
+8. Stop and clean up the containers and volumes.
+```
+docker stop datatest2
+```
+```
+docker rm datatest2
+```
+```
+docker volume rm datavolume
+```
+
