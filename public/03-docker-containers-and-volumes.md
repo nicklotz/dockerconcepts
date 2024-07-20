@@ -331,7 +331,10 @@ watch docker logs -f alwaysrestartapp
 docker stop alwaysrestartapp
 ```
 ```
-systemctl restart docker
+docker ps -a -f name=alwaysrestartapp
+```
+```
+sudo systemctl restart docker
 ```
 ```
 watch docker ps -a -f name=alwaysrestartapp
@@ -393,7 +396,7 @@ docker ps -a -f name=healthyapp
 
 21. Restart the Docker daemon and check the container status again. Is the status what you expect?
 ```
-systemctl restart docker
+sudo systemctl restart docker
 ```
 ```
 docker ps -a -f name=healthyapp
