@@ -282,6 +282,7 @@ WORKDIR /app
 COPY crash.py .
 CMD ["python", "crash.py"]
 EOF
+```
 
 4. Build the Docker image.
 ```
