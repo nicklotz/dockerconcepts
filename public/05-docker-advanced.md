@@ -54,7 +54,7 @@ docker run --user $UID:$(id -g $USER) -it ubuntu whoami
 docker context use default
 ```
 
-B. Lightweight Docker Images
+## B. Lightweight Docker Images
 
 > Many program distributions, especially operating system programs, offer a **slim** version of their image, stripping out non-essential packages and documentation.
 
