@@ -249,3 +249,138 @@ docker rm datatest2
 docker volume rm datavolume
 ```
 
+## E. Restart Policies
+
+> Docker supports **restart policies** to manage the automatic restarting of containers. These policies dictate how Docker should handle scenarios, like crashes, system reboots, or manual stops. The available policies include **no**, **always**, **unless-stopped**, and **on-failure**.
+
+1. Create and change into a new directory to hold an application and its Dockerfile.
+```
+mkdir crashapp/
+```
+```
+cd crashapp/
+```
+
+2. Populate a Python program that intentionally crashes after a short delay.
+```
+cat << EOF > crashapp.py
+import time
+import sys
+
+print("Starting the application...")
+time.sleep(10)
+print("Crashing the application...")
+sys.exit(1)
+EOF
+```
+
+3. Populate a Dockerfile that containerizes and then runs the application when launched.
+```
+cat << EOF > Dockerfile
+FROM python:3.8-slim
+WORKDIR /app
+COPY crash.py .
+CMD ["python", "crash.py"]
+EOF
+
+4. Build the Docker image.
+```
+docker built -t crashapp .
+```
+
+> Let's now practice using the restart policies of **no**, **always**, **unless-stopped**, and **on-failure**.
+
+5. Launch an instance of the **crashapp** container with the **no** restart policy.
+```
+docker run -d --restart=no --name norestartapp crashapp
+```
+
+6. Observe the restart behavior, or lack thereof.
+```
+docker ps -f name=norestartapp
+```
+
+7. Explore the container logs for **norestartapp**.
+```
+docker logs -f norestartapp
+```
+
+8. Remove the **norestartapp** container.
+```
+docker rm norestartapp
+```
+
+9. Re-run **crashapp**, this time with an **always** restart policy.
+```
+docker run -d --restart=always --name alwaysrestartapp crashapp
+```
+
+10. Observe the restart behavior.
+```
+watch docker ps -f name=alwaysrestartapp
+```
+
+11. Watch the logs to see the **alwayscrashapp** container repeatedly restarting after crashing.
+```
+watch docker logs -f alwaysrestartapp
+```
+
+12. After a few cycles, stop the **alwaysrestartapp** container.
+```
+docker stop alwaysrestartapp
+```
+```
+docker rm alwaysrestartapp
+```
+
+13. Re-run **crashap**, this time with an **on-failure** restart policy.
+```
+docker run -d --restart=on-failure --name onfailureapp crashapp
+```
+
+14. Observe the restart behavior.
+```
+watch docker ps -f name=onfailureapp
+```
+
+15. Watch the logs for the **onfailureapp** container.
+```
+watch docker logs -f onfailureapp
+```
+
+16. Stop and remove the **onfailureapp** container.
+```
+docker stop onfailureapp
+```
+```
+docker rm onfailureapp
+```
+
+17. Run a healhty app, this time with an **unless-stopped** restart policy.
+```
+docker run -d --restart=unless-stopped --name healthyapp busybox "echo 'hello world`; sleep 10"
+```
+
+18. Observe the **healthyapp** container.
+```
+watch docker ps -f name=healthyapp
+```
+
+19. Watch the **healthyapp** container logs.
+```
+watch docker logs -f healthyapp
+```
+
+20. Manually stop and remove the **healthyapp** container.
+```
+docker stop healthyapp
+```
+```
+docker remove healthyapp
+```
+
+21. Clean up any leftover running or stopped containers.
+```
+docker rm $(docker ps -a -q)
+```
+
