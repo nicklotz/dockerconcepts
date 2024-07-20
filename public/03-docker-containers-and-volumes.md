@@ -298,12 +298,12 @@ docker run -d --restart=no --name norestartapp crashapp
 
 6. Observe the restart behavior, or lack thereof.
 ```
-docker ps -f name=norestartapp
+watch docker ps -f name=norestartapp
 ```
 
 7. Explore the container logs for **norestartapp**.
 ```
-docker logs -f norestartapp
+watch docker logs -f norestartapp
 ```
 
 8. Remove the **norestartapp** container.
