@@ -316,17 +316,28 @@ docker rm norestartapp
 docker run -d --restart=always --name alwaysrestartapp crashapp
 ```
 
-10. Observe the restart behavior.
+10. Observe the restart behavior as well as the container logs.
 ```
 watch docker ps -a -f name=alwaysrestartapp
 ```
-
-11. Watch the logs to see the **alwayscrashapp** container repeatedly restarting after crashing.
 ```
 watch docker logs -f alwaysrestartapp
 ```
 
-12. After a few cycles, stop the **alwaysrestartapp** container.
+> With the **always** restart policy, the container will automatically restart if manually stopped only after also restarting the docker daemon.
+
+11. After a few cycles, stop the **alwaysrestartapp** container, then restart the Docker daemon and check the container status.
+```
+docker stop alwaysrestartapp
+```
+```
+systemctl restart docker
+```
+```
+watch docker ps -a -f name=alwaysrestartapp
+```
+
+12. Stop and remove the **alwaysrestartapp** container
 ```
 docker stop alwaysrestartapp
 ```
@@ -359,7 +370,7 @@ docker rm onfailureapp
 
 17. Run a healhty app, this time with an **unless-stopped** restart policy.
 ```
-docker run -d --restart=unless-stopped --name healthyapp busybox "echo 'hello world`; sleep 10"
+docker run -d --restart=unless-stopped --name healthyapp busybox sh -c "echo 'hello world'; sleep 10"
 ```
 
 18. Observe the **healthyapp** container.
@@ -372,15 +383,28 @@ watch docker ps -a -f name=healthyapp
 watch docker logs -f healthyapp
 ```
 
-20. Manually stop and remove the **healthyapp** container.
+20. Manually stop the **healthyapp** container and observe the status.
 ```
 docker stop healthyapp
 ```
 ```
+docker ps -a -f name=healthyapp
+```
+
+21. Restart the Docker daemon and check the container status again. Is the status what you expect?
+```
+systemctl restart docker
+```
+```
+docker ps -a -f name=healthyapp
+```
+
+22. Manually remove the **healthyapp** container.
+```
 docker rm healthyapp
 ```
 
-21. Clean up any leftover running or stopped containers.
+23. Clean up any leftover running or stopped containers.
 ```
 docker rm $(docker ps -a -q)
 ```
