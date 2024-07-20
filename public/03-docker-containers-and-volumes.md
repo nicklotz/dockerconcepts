@@ -286,7 +286,7 @@ EOF
 
 4. Build the Docker image.
 ```
-docker built -t crashapp .
+docker build -t crashapp .
 ```
 
 > Let's now practice using the restart policies of **no**, **always**, **unless-stopped**, and **on-failure**.
