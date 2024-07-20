@@ -279,8 +279,8 @@ EOF
 cat << EOF > Dockerfile
 FROM python:3.8-slim
 WORKDIR /app
-COPY crash.py .
-CMD ["python", "crash.py"]
+COPY crashapp.py .
+CMD ["python", "crashapp.py"]
 EOF
 ```
 
