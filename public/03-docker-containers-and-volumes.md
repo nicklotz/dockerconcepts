@@ -298,7 +298,7 @@ docker run -d --restart=no --name norestartapp crashapp
 
 6. Observe the restart behavior, or lack thereof.
 ```
-watch docker ps -f name=norestartapp
+watch docker ps -a -f name=norestartapp
 ```
 
 7. Explore the container logs for **norestartapp**.
@@ -318,7 +318,7 @@ docker run -d --restart=always --name alwaysrestartapp crashapp
 
 10. Observe the restart behavior.
 ```
-watch docker ps -f name=alwaysrestartapp
+watch docker ps -a -f name=alwaysrestartapp
 ```
 
 11. Watch the logs to see the **alwayscrashapp** container repeatedly restarting after crashing.
@@ -341,7 +341,7 @@ docker run -d --restart=on-failure --name onfailureapp crashapp
 
 14. Observe the restart behavior.
 ```
-watch docker ps -f name=onfailureapp
+watch docker ps -a -f name=onfailureapp
 ```
 
 15. Watch the logs for the **onfailureapp** container.
@@ -364,7 +364,7 @@ docker run -d --restart=unless-stopped --name healthyapp busybox "echo 'hello wo
 
 18. Observe the **healthyapp** container.
 ```
-watch docker ps -f name=healthyapp
+watch docker ps -a -f name=healthyapp
 ```
 
 19. Watch the **healthyapp** container logs.
@@ -377,7 +377,7 @@ watch docker logs -f healthyapp
 docker stop healthyapp
 ```
 ```
-docker remove healthyapp
+docker rm healthyapp
 ```
 
 21. Clean up any leftover running or stopped containers.
