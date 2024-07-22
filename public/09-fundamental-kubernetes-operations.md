@@ -1,1 +1,0 @@
-# Fundamental Kubernetes Operations
