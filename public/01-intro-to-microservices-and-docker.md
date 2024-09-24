@@ -1,7 +1,34 @@
-# Introduction to Docker
+# Introduction to Docker and Microservices
 
-## A. Install Docker (if not already)
-Docker has a convenient installation script if you're on a *nix-based system. If you're on Windows, [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) is recommended.
+- In a traditional **monolithic architecture**, all components (UI, Business Logic, Data Access Layer) are part of a single, unified application interacting with one central database
+
+```mermaid
+graph TD
+    subgraph Monolithic Application
+        UI[User Interface] --> BL[Business Logic]
+        BL --> DAL[Data Access Layer]
+        DAL --> DB[(Database)]
+    end
+```
+
+- In a **microservices architecture**, the application is broken down into independent services
+- Each service handles a specific function, and they communicate with the user interface independently
+- Each service may also have its own database (not always)
+
+```mermaid
+graph TD
+    UI[User Interface] --> Svc1[Service 1]
+    UI --> Svc2[Service 2]
+    UI --> Svc3[Service 3]
+
+    Svc1 --> DB1[(Database 1)]
+    Svc2 --> DB2[(Database 2)]
+    Svc3 --> DB3[(Database 3)]
+```
+
+## B. Install Docker (if not already)
+> Docker has a convenient installation script if you're on a *nix-based system. If you're on Windows, [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) is recommended.
+
 1. In a terminal, download the Docker install script.
 
 ```
@@ -29,7 +56,7 @@ sudo usermod -aG docker $USER
 docker run hello-world
 ```
 
-## B. Deploy Sample Microservices App
+## C. Deploy Sample Microservices App
 
 1. Clone a sample microservices app that deploys a voting app.
 
