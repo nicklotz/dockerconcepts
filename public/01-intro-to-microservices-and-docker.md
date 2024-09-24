@@ -26,6 +26,28 @@ graph TD
     Svc3 --> DB3[(Database 3)]
 ```
 
+- Importance of the cloud and **stateless** applications
+  - State and logic are decoupled
+  - Horizontal scaling, traffic routed to any available instance
+  - Elasticity due to swings in demand
+  - Multi-region deployments don't have to sync session data
+
+- Core components of being **"cloud-native"**
+  - Microservices
+  - Containerization
+  - Automated orchestration (e.g. Kubernetes)
+  - Externalized state
+  - API-first communication
+ 
+- **Infrastructure-as-code (IaC)** plays a starring role
+ - Reproducable, ideally declarative, text-based configurations of what your deployments and infrastructure look like
+ - Used for **provisioning**, i.e. creating the infrastructure needed to host your app
+ - Used for **coniguring**, i.e. managing the supporting software and settings inside the infrastructure
+ - IaC means can take software development model approach, with code reviews, testing, and PRs
+
+## B. Intro to Docker
+
+
 ## B. Install Docker (if not already)
 > Docker has a convenient installation script if you're on a *nix-based system. If you're on Windows, [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) is recommended.
 
