@@ -225,26 +225,26 @@ https://hub.docker.com
 
 6. In the window showing the generated credential, click **Copy and Close** to copy the token to your clipboard. Paste the token in a safe pace you can refer back to.
 
-7. Back in your terminal, authneticate to Docker Hub.
+7. Back in your terminal, run the following to create an environment variable for your Docker username. 
+```
+read -p "Enter your name [Richard]: " MY_DOCKER_USERNAME
+```
+
+8. Authneticate to Docker Hub.
 ```
 docker login
 ```
 
-8. When prompted for a **Username**, enter your Docker ID or email address.
+9. When prompted for a **Username**, enter your Docker ID or email address.
 
-9. When prompted for a **Password**, paste the token copied and saved in step 6.
+10. When prompted for a **Password**, paste the token copied and saved in step 6.
 
-10. After logging in, run the following to verify Docker has locally stored a Docker Hub registry credential.
+11. After logging in, run the following to verify Docker has locally stored a Docker Hub registry credential.
 ```
 cat ~/.docker/config.json
 ```
 
 > To upload a local Docker image to Docker Hub, the name must include the path in the registry where it will live.
-
-11. Run the following to create an environment variable for your Docker username. 
-```
-read -p "Enter your name [Richard]: " MY_DOCKER_USERNAME
-```
 
 12. Tag your local Docker image to include your Docker Username as well as an explicit version tag.
 ```
