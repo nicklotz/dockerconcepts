@@ -130,13 +130,13 @@ cd example-voting-app/
 docker compose up --detach
 ```
 
-4. Open the voting page in your browser at [http://localhost:5000](http://localhost:5000) or inspect it in your terminal.
+4. Open the voting page in your browser at [http://localhost:8080](http://localhost:8080) or inspect it in your terminal.
 
 ```
 curl http://localhost:8080
 ```
 
-5. Open the results page in your browser at [http://localhost:5001](http://localhost:5001) or inspect it in your terminal.
+5. Open the results page in your browser at [http://localhost:8081](http://localhost:8081) or inspect it in your terminal.
 
 ```
 curl http://localhost:8081
@@ -162,13 +162,13 @@ cat docker-compose.yml
 docker stop $(docker ps -q --filter ancestor=example-voting-app-vote)
 ```
 
-9. Attempt to access the voting page in your browser at [http://localhost:5000](http://localhost:5000) or in your terminal.
+9. Attempt to access the voting page in your browser at [http://localhost:8080](http://localhost:8080) or in your terminal.
 
 ```
 curl http://localhost:8080
 ```
 
-10. Attempt to access the results page in your browser at [http://localhost:5001](http://localhost:5001) or in your terminal.
+10. Attempt to access the results page in your browser at [http://localhost:8081](http://localhost:8081) or in your terminal.
 
 ```
 curl http://localhost:8081
