@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Containerization - Day 1</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+    <style>
+        :root {
+            --docker-blue: #0db7ed;
+            --docker-dark: #384d54;
+            --docker-light: #c9e6f0;
+            --docker-white: #FFFFFF;
+            --docker-gray: #6B7280;
+        }
+
+        .reveal { background: linear-gradient(135deg, #0a1628 0%, #1a2d4a 100%); }
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; color: var(--docker-blue); }
+        .reveal h1 { color: var(--docker-white); }
+        .reveal section { text-align: left; }
+        .reveal section.center { text-align: center; }
+        .reveal pre { width: 100%; }
+        .reveal code { background: #1e3a5f; padding: 2px 8px; border-radius: 3px; }
+        .highlight { color: var(--docker-blue); }
+        .highlight-gold { color: #FBBF24; }
+
+        .topic-intro { color: #60A5FA; }
+        .topic-images { color: #34D399; }
+        .topic-containers { color: #F472B6; }
+        .topic-compose { color: #A78BFA; }
+        .topic-security { color: #FBBF24; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .three-column { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+        .small-text { font-size: 0.65em; }
+        .tiny-text { font-size: 0.55em; }
+
+        .reveal h1 { font-size: 2.2em; margin-bottom: 0.5em; }
+        .reveal h2 { font-size: 1.6em; margin-bottom: 0.5em; margin-top: 0; }
+        .reveal h3 { font-size: 1.2em; margin-top: 1.2rem; margin-bottom: 0.6rem; }
+        .reveal h4 { font-size: 1em; margin-top: 1rem; margin-bottom: 0.4rem; }
+        .reveal ul, .reveal ol { margin-top: 0.5rem; margin-bottom: 0.5rem; font-size: 0.85em; }
+        .reveal li { margin-bottom: 0.3rem; line-height: 1.3; }
+        .reveal p { margin: 0.5rem 0; font-size: 0.85em; line-height: 1.4; }
+
+        .reveal .slides section {
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        .topic-card {
+            background: rgba(13, 183, 237, 0.1);
+            border-left: 4px solid var(--docker-blue);
+            padding: 0.6rem;
+            margin: 0.4rem 0;
+            font-size: 0.85em;
+        }
+        .topic-card ul, .topic-card ol { margin: 0.3rem 0; }
+        .topic-card li { margin-bottom: 0.2rem; }
+
+        .lab-slide {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            border: 3px solid #34D399;
+        }
+        .lab-slide h2 { color: #34D399; }
+
+        .reveal table {
+            font-size: 0.7em;
+            margin: 0.5rem 0;
+        }
+        .reveal table td, .reveal table th {
+            padding: 0.3rem 0.5rem;
+        }
+
+        .day-header {
+            background: var(--docker-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.7em;
+            overflow-x: auto;
+        }
+
+        .command { color: #60A5FA; }
+        .string { color: #34D399; }
+        .comment { color: #6B7280; }
+        .keyword { color: #F472B6; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Title Slide -->
+            <section class="center">
+                <h1>Docker Containerization</h1>
+                <h3>Building, Storing, and Deploying Containers</h3>
+                <p style="margin-top: 2rem; color: var(--docker-gray);">Containerization Fast Track - Day 1</p>
+            </section>
+
+            <!-- Course Overview -->
+            <section>
+                <h2>Course Overview</h2>
+                <p>Learn the skills required to build, store, and deploy containers using Docker.</p>
+
+                <h3>What You'll Learn</h3>
+                <div class="two-column small-text">
+                    <div>
+                        <ul>
+                            <li>Microservices vs Monolithic architecture</li>
+                            <li>Container fundamentals and Docker basics</li>
+                            <li>Building efficient Docker images</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul>
+                            <li>Managing containers, volumes, and networks</li>
+                            <li>Docker Compose for development</li>
+                            <li>CI/CD pipelines and security scanning</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card" style="margin-top: 1rem;">
+                    <p><strong>Course Philosophy:</strong> 70% hands-on labs and exercises, 30% expert-led instruction</p>
+                </div>
+            </section>
+
+            <!-- Agenda -->
+            <section>
+                <h2>Day 1 Agenda</h2>
+                <div class="two-column small-text">
+                    <div class="topic-card">
+                        <h4 class="topic-intro">Morning</h4>
+                        <ul>
+                            <li>Distributed Systems & Cloud Native</li>
+                            <li>Microservices vs Monolith</li>
+                            <li>Introduction to Containers</li>
+                            <li>Docker Architecture</li>
+                            <li>Building Docker Images</li>
+                        </ul>
+                    </div>
+                    <div class="topic-card">
+                        <h4 class="topic-containers">Afternoon</h4>
+                        <ul>
+                            <li>Working with Containers</li>
+                            <li>Volumes and State Management</li>
+                            <li>Docker Networking</li>
+                            <li>Docker Compose</li>
+                            <li>CI/CD and Security</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Microservices -->
+            <section class="center">
+                <div class="day-header">
+                    <h3 style="margin: 0; color: white;">Module 1</h3>
+                </div>
+                <h1 class="topic-intro">Microservices & Cloud Native</h1>
+            </section>
+
+            <!-- Monolith vs Microservices -->
+            <section>
+                <h2 class="topic-intro">Monolith vs Microservices</h2>
+
+                <div class="two-column">
+                    <div>
+                        <h3>Monolithic Architecture</h3>
+                        <ul class="small-text">
+                            <li class="fragment">Single, unified application</li>
+                            <li class="fragment">All components tightly coupled</li>
+                            <li class="fragment">One codebase, one deployment</li>
+                            <li class="fragment">Scales as a single unit</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Microservices Architecture</h3>
+                        <ul class="small-text">
+                            <li class="fragment">Independent services</li>
+                            <li class="fragment">Loosely coupled components</li>
+                            <li class="fragment">Deploy services independently</li>
+                            <li class="fragment">Scale individual services</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Key Insight:</strong> Each microservice handles a specific function and can have its own database</p>
+                </div>
+            </section>
+
+            <!-- Why Stateless -->
+            <section>
+                <h2 class="topic-intro">Why Stateless Applications?</h2>
+
+                <p>The cloud favors stateless applications for predictable and easy scaling.</p>
+
+                <h3>Benefits of Stateless Design</h3>
+                <ul>
+                    <li class="fragment"><strong>Horizontal Scaling:</strong> Traffic can be routed to any available instance</li>
+                    <li class="fragment"><strong>Elasticity:</strong> Handle swings in demand easily</li>
+                    <li class="fragment"><strong>Multi-Region:</strong> No need to sync session data</li>
+                    <li class="fragment"><strong>Resilience:</strong> Failed instances can be replaced without data loss</li>
+                </ul>
+
+                <div class="topic-card fragment">
+                    <p><strong>Principle:</strong> State and logic are decoupled - store state externally (databases, caches)</p>
+                </div>
+            </section>
+
+            <!-- Cloud Native -->
+            <section>
+                <h2 class="topic-intro">What is Cloud Native?</h2>
+
+                <div class="three-column small-text">
+                    <div class="topic-card">
+                        <h4>Architecture</h4>
+                        <ul>
+                            <li>Microservices</li>
+                            <li>API-first communication</li>
+                            <li>Externalized state</li>
+                        </ul>
+                    </div>
+                    <div class="topic-card">
+                        <h4>Packaging</h4>
+                        <ul>
+                            <li>Containerization</li>
+                            <li>Immutable images</li>
+                            <li>Version controlled</li>
+                        </ul>
+                    </div>
+                    <div class="topic-card">
+                        <h4>Operations</h4>
+                        <ul>
+                            <li>Automated orchestration</li>
+                            <li>Infrastructure as Code</li>
+                            <li>CI/CD pipelines</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="fragment">Infrastructure as Code (IaC)</h3>
+                <ul class="fragment small-text">
+                    <li>Reproducible, declarative, text-based configurations</li>
+                    <li>Version controlled with code reviews and PRs</li>
+                    <li>Automated provisioning and configuration</li>
+                </ul>
+            </section>
+
+            <!-- Section: Containers -->
+            <section class="center">
+                <div class="day-header">
+                    <h3 style="margin: 0; color: white;">Module 2</h3>
+                </div>
+                <h1 class="topic-images">Introduction to Containers</h1>
+            </section>
+
+            <!-- Containers vs VMs -->
+            <section>
+                <h2 class="topic-images">Containers vs Virtual Machines</h2>
+
+                <div class="two-column">
+                    <div>
+                        <h3>Virtual Machines</h3>
+                        <ul class="small-text">
+                            <li>Full OS per instance</li>
+                            <li>Gigabytes in size</li>
+                            <li>Minutes to start</li>
+                            <li>Hardware-level isolation</li>
+                            <li>Requires hypervisor</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Containers</h3>
+                        <ul class="small-text">
+                            <li>Shared OS kernel</li>
+                            <li>Megabytes in size</li>
+                            <li>Seconds to start</li>
+                            <li>Process-level isolation</li>
+                            <li>Container runtime (Docker)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Key Benefit:</strong> "It works on my machine" becomes "It works in this container" - consistent behavior everywhere</p>
+                </div>
+            </section>
+
+            <!-- Container Ecosystem -->
+            <section>
+                <h2 class="topic-images">Container Ecosystem</h2>
+
+                <div class="three-column small-text">
+                    <div class="topic-card">
+                        <h4>Runtimes</h4>
+                        <ul>
+                            <li>Docker</li>
+                            <li>containerd</li>
+                            <li>CRI-O</li>
+                            <li>Podman</li>
+                        </ul>
+                    </div>
+                    <div class="topic-card">
+                        <h4>Orchestration</h4>
+                        <ul>
+                            <li>Kubernetes</li>
+                            <li>Docker Swarm</li>
+                            <li>Amazon ECS</li>
+                        </ul>
+                    </div>
+                    <div class="topic-card">
+                        <h4>Tools</h4>
+                        <ul>
+                            <li>Helm</li>
+                            <li>Prometheus</li>
+                            <li>Grafana</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Docker Architecture -->
+            <section>
+                <h2 class="topic-images">Docker Architecture</h2>
+
+                <h3>Key Concepts</h3>
+                <ul class="small-text">
+                    <li class="fragment"><strong>Image:</strong> Read-only template for creating containers</li>
+                    <li class="fragment"><strong>Container:</strong> Running instance of an image</li>
+                    <li class="fragment"><strong>Dockerfile:</strong> Script defining how to build an image</li>
+                    <li class="fragment"><strong>Registry:</strong> Storage for Docker images (Docker Hub, ECR)</li>
+                    <li class="fragment"><strong>Volume:</strong> Persistent storage for container data</li>
+                </ul>
+
+                <h3 class="fragment">Docker Workflow</h3>
+                <div class="fragment" style="display: flex; justify-content: space-around; margin-top: 1rem;">
+                    <div class="topic-card" style="padding: 0.5rem 1rem;">Write Dockerfile</div>
+                    <div style="align-self: center;">→</div>
+                    <div class="topic-card" style="padding: 0.5rem 1rem;">Build Image</div>
+                    <div style="align-self: center;">→</div>
+                    <div class="topic-card" style="padding: 0.5rem 1rem;">Run Container</div>
+                </div>
+            </section>
+
+            <!-- Section: Building Images -->
+            <section class="center">
+                <div class="day-header">
+                    <h3 style="margin: 0; color: white;">Module 3</h3>
+                </div>
+                <h1 class="topic-images">Building Docker Images</h1>
+            </section>
+
+            <!-- Dockerfile Basics -->
+            <section>
+                <h2 class="topic-images">Writing a Dockerfile</h2>
+
+                <div class="code-block">
+                    <pre><span class="comment"># Use an official base image</span>
+<span class="keyword">FROM</span> python:3.9-slim
+
+<span class="comment"># Set working directory</span>
+<span class="keyword">WORKDIR</span> /app
+
+<span class="comment"># Copy requirements first (for caching)</span>
+<span class="keyword">COPY</span> requirements.txt .
+
+<span class="comment"># Install dependencies</span>
+<span class="keyword">RUN</span> pip install -r requirements.txt
+
+<span class="comment"># Copy application code</span>
+<span class="keyword">COPY</span> . .
+
+<span class="comment"># Expose port</span>
+<span class="keyword">EXPOSE</span> 5000
+
+<span class="comment"># Define startup command</span>
+<span class="keyword">CMD</span> [<span class="string">"python"</span>, <span class="string">"app.py"</span>]</pre>
+                </div>
+            </section>
+
+            <!-- Image Layers -->
+            <section>
+                <h2 class="topic-images">Understanding Layers</h2>
+
+                <p>Each Dockerfile instruction creates a new layer. Layers are cached for efficiency.</p>
+
+                <div class="two-column small-text">
+                    <div>
+                        <h3>Layer Best Practices</h3>
+                        <ul>
+                            <li class="fragment">Order instructions from least to most frequently changing</li>
+                            <li class="fragment">Combine RUN commands to reduce layers</li>
+                            <li class="fragment">Copy dependency files before source code</li>
+                            <li class="fragment">Use .dockerignore to exclude files</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <div class="code-block" style="font-size: 0.6em;">
+                            <pre><span class="comment"># Good: Combined RUN</span>
+<span class="keyword">RUN</span> apt-get update && \
+    apt-get install -y nginx && \
+    rm -rf /var/lib/apt/lists/*
+
+<span class="comment"># Bad: Multiple layers</span>
+<span class="keyword">RUN</span> apt-get update
+<span class="keyword">RUN</span> apt-get install -y nginx
+<span class="keyword">RUN</span> rm -rf /var/lib/apt/lists/*</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Multi-Stage Builds -->
+            <section>
+                <h2 class="topic-images">Multi-Stage Builds</h2>
+
+                <p>Create smaller production images by separating build and runtime stages.</p>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># Build stage</span>
+<span class="keyword">FROM</span> golang:1.21 <span class="keyword">AS</span> builder
+<span class="keyword">WORKDIR</span> /app
+<span class="keyword">COPY</span> . .
+<span class="keyword">RUN</span> CGO_ENABLED=0 go build -o myapp
+
+<span class="comment"># Production stage - minimal image</span>
+<span class="keyword">FROM</span> alpine:latest
+<span class="keyword">COPY</span> --from=builder /app/myapp /myapp
+<span class="keyword">CMD</span> [<span class="string">"/myapp"</span>]</pre>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Result:</strong> Final image contains only the compiled binary, not the entire Go toolchain</p>
+                </div>
+            </section>
+
+            <!-- Lightweight Images -->
+            <section>
+                <h2 class="topic-images">Creating Efficient Images</h2>
+
+                <h3>Base Image Comparison</h3>
+                <table>
+                    <tr>
+                        <th>Base Image</th>
+                        <th>Size</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>ubuntu:22.04</td>
+                        <td>~77MB</td>
+                        <td>Full-featured development</td>
+                    </tr>
+                    <tr>
+                        <td>debian:slim</td>
+                        <td>~52MB</td>
+                        <td>Reduced footprint</td>
+                    </tr>
+                    <tr>
+                        <td>alpine:latest</td>
+                        <td>~7MB</td>
+                        <td>Minimal production images</td>
+                    </tr>
+                    <tr>
+                        <td>distroless</td>
+                        <td>~2MB</td>
+                        <td>Maximum security</td>
+                    </tr>
+                </table>
+
+                <div class="topic-card fragment">
+                    <p><strong>Tip:</strong> Use specific version tags, not <code>:latest</code>, for reproducible builds</p>
+                </div>
+            </section>
+
+            <!-- Docker Commands -->
+            <section>
+                <h2 class="topic-images">Essential Docker Commands</h2>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># Build an image</span>
+<span class="command">docker build -t myapp:v1 .</span>
+
+<span class="comment"># List images</span>
+<span class="command">docker images</span>
+
+<span class="comment"># Run a container</span>
+<span class="command">docker run -d -p 8080:80 --name myapp myapp:v1</span>
+
+<span class="comment"># List running containers</span>
+<span class="command">docker ps</span>
+
+<span class="comment"># View logs</span>
+<span class="command">docker logs myapp</span>
+
+<span class="comment"># Execute command in container</span>
+<span class="command">docker exec -it myapp /bin/sh</span>
+
+<span class="comment"># Stop and remove</span>
+<span class="command">docker stop myapp && docker rm myapp</span></pre>
+                </div>
+            </section>
+
+            <!-- Lab: Images -->
+            <section class="lab-slide">
+                <h2>Lab: Building Docker Images</h2>
+
+                <h3>Exercise Objectives</h3>
+                <ul>
+                    <li>Explore image immutability and layers</li>
+                    <li>Build images from Dockerfiles</li>
+                    <li>Create multi-stage builds</li>
+                    <li>Push images to Docker Hub</li>
+                </ul>
+
+                <h3>You Will Learn</h3>
+                <ul>
+                    <li>Dockerfile instruction syntax</li>
+                    <li>Layer caching strategies</li>
+                    <li>Image tagging conventions</li>
+                    <li>Registry authentication</li>
+                </ul>
+            </section>
+
+            <!-- Section: Containers -->
+            <section class="center">
+                <div class="day-header">
+                    <h3 style="margin: 0; color: white;">Module 4</h3>
+                </div>
+                <h1 class="topic-containers">Working with Containers</h1>
+            </section>
+
+            <!-- Container Isolation -->
+            <section>
+                <h2 class="topic-containers">Container Isolation</h2>
+
+                <p>Containers from the same image are isolated from each other by default.</p>
+
+                <div class="two-column small-text">
+                    <div>
+                        <h3>Process Isolation</h3>
+                        <ul>
+                            <li>Each container has its own PID namespace</li>
+                            <li>Processes cannot see each other</li>
+                            <li>Separate process trees</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Filesystem Isolation</h3>
+                        <ul>
+                            <li>Each container has its own filesystem</li>
+                            <li>Changes don't affect other containers</li>
+                            <li>Writable layer is container-specific</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Note:</strong> To share data between containers, use volumes or shared networks</p>
+                </div>
+            </section>
+
+            <!-- Port Mapping -->
+            <section>
+                <h2 class="topic-containers">Port Mapping</h2>
+
+                <p>Map container ports to host ports for external access.</p>
+
+                <div class="code-block">
+                    <pre><span class="comment"># Map host port 8080 to container port 80</span>
+<span class="command">docker run -d -p 8080:80 nginx</span>
+
+<span class="comment"># Map multiple ports</span>
+<span class="command">docker run -d -p 8080:80 -p 8443:443 nginx</span>
+
+<span class="comment"># Map to specific interface</span>
+<span class="command">docker run -d -p 127.0.0.1:8080:80 nginx</span></pre>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Format:</strong> <code>-p HOST_PORT:CONTAINER_PORT</code></p>
+                </div>
+            </section>
+
+            <!-- Environment Variables -->
+            <section>
+                <h2 class="topic-containers">Environment Variables</h2>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># Pass environment variable at runtime</span>
+<span class="command">docker run -e MY_VAR=value myapp</span>
+
+<span class="comment"># Pass multiple variables</span>
+<span class="command">docker run -e DB_HOST=localhost -e DB_PORT=5432 myapp</span>
+
+<span class="comment"># Use environment file</span>
+<span class="command">docker run --env-file .env myapp</span></pre>
+                </div>
+
+                <h3 class="fragment">In Dockerfile</h3>
+                <div class="code-block fragment small-text">
+                    <pre><span class="comment"># Set default value</span>
+<span class="keyword">ENV</span> MY_VAR=default_value
+
+<span class="comment"># Use in subsequent commands</span>
+<span class="keyword">RUN</span> echo $MY_VAR</pre>
+                </div>
+            </section>
+
+            <!-- Volumes -->
+            <section>
+                <h2 class="topic-containers">Docker Volumes</h2>
+
+                <p>Volumes persist data beyond the container lifecycle.</p>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># Create a named volume</span>
+<span class="command">docker volume create mydata</span>
+
+<span class="comment"># Mount volume to container</span>
+<span class="command">docker run -v mydata:/app/data myapp</span>
+
+<span class="comment"># Bind mount host directory</span>
+<span class="command">docker run -v $(pwd):/app myapp</span>
+
+<span class="comment"># List volumes</span>
+<span class="command">docker volume ls</span></pre>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Use Cases:</strong> Database storage, configuration files, shared data between containers</p>
+                </div>
+            </section>
+
+            <!-- Restart Policies -->
+            <section>
+                <h2 class="topic-containers">Restart Policies</h2>
+
+                <table>
+                    <tr>
+                        <th>Policy</th>
+                        <th>Behavior</th>
+                    </tr>
+                    <tr>
+                        <td><code>no</code></td>
+                        <td>Never restart (default)</td>
+                    </tr>
+                    <tr>
+                        <td><code>always</code></td>
+                        <td>Always restart, including after daemon restart</td>
+                    </tr>
+                    <tr>
+                        <td><code>unless-stopped</code></td>
+                        <td>Restart unless manually stopped</td>
+                    </tr>
+                    <tr>
+                        <td><code>on-failure</code></td>
+                        <td>Restart only on non-zero exit code</td>
+                    </tr>
+                </table>
+
+                <div class="code-block fragment" style="margin-top: 1rem;">
+                    <pre><span class="command">docker run --restart=always myapp</span></pre>
+                </div>
+            </section>
+
+            <!-- Lab: Containers -->
+            <section class="lab-slide">
+                <h2>Lab: Working with Containers</h2>
+
+                <h3>Exercise Objectives</h3>
+                <ul>
+                    <li>Explore container isolation</li>
+                    <li>Configure port mappings</li>
+                    <li>Work with environment variables</li>
+                    <li>Create and use volumes</li>
+                    <li>Test restart policies</li>
+                </ul>
+            </section>
+
+            <!-- Section: Networking -->
+            <section class="center">
+                <div class="day-header">
+                    <h3 style="margin: 0; color: white;">Module 5</h3>
+                </div>
+                <h1 class="topic-containers">Docker Networking</h1>
+            </section>
+
+            <!-- Network Types -->
+            <section>
+                <h2 class="topic-containers">Docker Network Types</h2>
+
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td><code>bridge</code></td>
+                        <td>Default isolated network</td>
+                        <td>Single-host containers</td>
+                    </tr>
+                    <tr>
+                        <td><code>host</code></td>
+                        <td>Share host's network</td>
+                        <td>Performance-critical apps</td>
+                    </tr>
+                    <tr>
+                        <td><code>none</code></td>
+                        <td>No networking</td>
+                        <td>Isolated processing</td>
+                    </tr>
+                    <tr>
+                        <td><code>overlay</code></td>
+                        <td>Multi-host networking</td>
+                        <td>Docker Swarm clusters</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Custom Networks -->
+            <section>
+                <h2 class="topic-containers">Custom Bridge Networks</h2>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># Create a custom network</span>
+<span class="command">docker network create mynetwork</span>
+
+<span class="comment"># Run containers on the network</span>
+<span class="command">docker run -d --name web --network mynetwork nginx</span>
+<span class="command">docker run -d --name db --network mynetwork postgres</span>
+
+<span class="comment"># Containers can reach each other by name</span>
+<span class="command">docker exec web ping db</span>
+
+<span class="comment"># Inspect network</span>
+<span class="command">docker network inspect mynetwork</span></pre>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Benefit:</strong> Custom networks provide automatic DNS resolution between containers</p>
+                </div>
+            </section>
+
+            <!-- Section: Docker Compose -->
+            <section class="center">
+                <div class="day-header">
+                    <h3 style="margin: 0; color: white;">Module 6</h3>
+                </div>
+                <h1 class="topic-compose">Docker Compose</h1>
+            </section>
+
+            <!-- Why Compose -->
+            <section>
+                <h2 class="topic-compose">Why Docker Compose?</h2>
+
+                <div class="two-column small-text">
+                    <div>
+                        <h3>Without Compose</h3>
+                        <ul>
+                            <li>Multiple docker run commands</li>
+                            <li>Manual network creation</li>
+                            <li>Complex volume management</li>
+                            <li>Hard to reproduce setup</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>With Compose</h3>
+                        <ul>
+                            <li>Single YAML configuration</li>
+                            <li>Automatic networking</li>
+                            <li>Declarative volumes</li>
+                            <li>One command: <code>docker compose up</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Compose File -->
+            <section>
+                <h2 class="topic-compose">Docker Compose File</h2>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># docker-compose.yml</span>
+<span class="keyword">services</span>:
+  <span class="keyword">web</span>:
+    build: .
+    ports:
+      - <span class="string">"5000:5000"</span>
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+
+  <span class="keyword">redis</span>:
+    image: redis:alpine
+
+  <span class="keyword">db</span>:
+    image: postgres:15
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=secret
+
+<span class="keyword">volumes</span>:
+  db_data:</pre>
+                </div>
+            </section>
+
+            <!-- Compose Commands -->
+            <section>
+                <h2 class="topic-compose">Docker Compose Commands</h2>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># Start all services</span>
+<span class="command">docker compose up -d</span>
+
+<span class="comment"># Build and start</span>
+<span class="command">docker compose up --build -d</span>
+
+<span class="comment"># View running services</span>
+<span class="command">docker compose ps</span>
+
+<span class="comment"># View logs</span>
+<span class="command">docker compose logs -f</span>
+
+<span class="comment"># Stop services</span>
+<span class="command">docker compose down</span>
+
+<span class="comment"># Stop and remove volumes</span>
+<span class="command">docker compose down -v</span></pre>
+                </div>
+            </section>
+
+            <!-- Lab: Compose -->
+            <section class="lab-slide">
+                <h2>Lab: Docker Compose</h2>
+
+                <h3>Exercise Objectives</h3>
+                <ul>
+                    <li>Create multi-service applications</li>
+                    <li>Configure service dependencies</li>
+                    <li>Use environment files</li>
+                    <li>Manage development workflows</li>
+                </ul>
+            </section>
+
+            <!-- Section: Security -->
+            <section class="center">
+                <div class="day-header">
+                    <h3 style="margin: 0; color: white;">Module 7</h3>
+                </div>
+                <h1 class="topic-security">CI/CD and Security</h1>
+            </section>
+
+            <!-- CI Pipeline -->
+            <section>
+                <h2 class="topic-security">Docker CI Pipeline Stages</h2>
+
+                <div style="display: flex; justify-content: space-between; margin: 1.5rem 0;">
+                    <div class="topic-card" style="flex: 1; margin: 0 0.25rem; text-align: center;">
+                        <h4>1. Test</h4>
+                        <p class="tiny-text">Run unit tests</p>
+                    </div>
+                    <div class="topic-card" style="flex: 1; margin: 0 0.25rem; text-align: center;">
+                        <h4>2. Build</h4>
+                        <p class="tiny-text">Build Docker image</p>
+                    </div>
+                    <div class="topic-card" style="flex: 1; margin: 0 0.25rem; text-align: center;">
+                        <h4>3. Scan</h4>
+                        <p class="tiny-text">Security scanning</p>
+                    </div>
+                    <div class="topic-card" style="flex: 1; margin: 0 0.25rem; text-align: center;">
+                        <h4>4. Push</h4>
+                        <p class="tiny-text">Push to registry</p>
+                    </div>
+                </div>
+
+                <div class="topic-card fragment">
+                    <p><strong>Key Principle:</strong> Fail fast - catch vulnerabilities before they reach production</p>
+                </div>
+            </section>
+
+            <!-- Security Scanning -->
+            <section>
+                <h2 class="topic-security">Security Scanning with Trivy</h2>
+
+                <div class="code-block small-text">
+                    <pre><span class="comment"># Scan a Docker image</span>
+<span class="command">trivy image nginx:latest</span>
+
+<span class="comment"># Scan with specific severity</span>
+<span class="command">trivy image --severity HIGH,CRITICAL nginx:latest</span>
+
+<span class="comment"># Fail build on vulnerabilities</span>
+<span class="command">trivy image --exit-code 1 --severity CRITICAL myapp:v1</span></pre>
+                </div>
+
+                <h3 class="fragment">Other Tools</h3>
+                <ul class="fragment small-text">
+                    <li><strong>Docker Scout:</strong> Native Docker security scanning</li>
+                    <li><strong>Snyk:</strong> Dependency and container scanning</li>
+                    <li><strong>Hadolint:</strong> Dockerfile linting</li>
+                </ul>
+            </section>
+
+            <!-- Security Best Practices -->
+            <section>
+                <h2 class="topic-security">Docker Security Best Practices</h2>
+
+                <div class="two-column small-text">
+                    <div>
+                        <h3>Image Security</h3>
+                        <ul>
+                            <li class="fragment">Use specific version tags</li>
+                            <li class="fragment">Use minimal base images</li>
+                            <li class="fragment">Scan images regularly</li>
+                            <li class="fragment">Update base images</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Runtime Security</h3>
+                        <ul>
+                            <li class="fragment">Run as non-root user</li>
+                            <li class="fragment">Use read-only filesystems</li>
+                            <li class="fragment">Never store secrets in images</li>
+                            <li class="fragment">Limit container capabilities</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-block fragment" style="margin-top: 1rem; font-size: 0.6em;">
+                    <pre><span class="comment"># Run as non-root</span>
+<span class="keyword">RUN</span> useradd -r appuser
+<span class="keyword">USER</span> appuser</pre>
+                </div>
+            </section>
+
+            <!-- Course Summary -->
+            <section>
+                <h2>Day 1 Summary</h2>
+
+                <div class="three-column small-text">
+                    <div class="topic-card">
+                        <h4 class="topic-intro">Concepts</h4>
+                        <ul>
+                            <li>Microservices architecture</li>
+                            <li>Cloud-native principles</li>
+                            <li>Containers vs VMs</li>
+                        </ul>
+                    </div>
+                    <div class="topic-card">
+                        <h4 class="topic-images">Building</h4>
+                        <ul>
+                            <li>Dockerfiles</li>
+                            <li>Image layers</li>
+                            <li>Multi-stage builds</li>
+                        </ul>
+                    </div>
+                    <div class="topic-card">
+                        <h4 class="topic-containers">Operations</h4>
+                        <ul>
+                            <li>Volumes & networking</li>
+                            <li>Docker Compose</li>
+                            <li>Security scanning</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="fragment">Key Takeaways</h3>
+                <ul class="fragment small-text">
+                    <li>Containers provide consistent, reproducible environments</li>
+                    <li>Use efficient, minimal images for production</li>
+                    <li>Docker Compose simplifies multi-service development</li>
+                    <li>Security scanning should be part of every CI pipeline</li>
+                </ul>
+            </section>
+
+            <!-- Next Steps -->
+            <section>
+                <h2>Next: Day 2 - Kubernetes</h2>
+
+                <h3>Tomorrow You'll Learn</h3>
+                <ul>
+                    <li>Kubernetes architecture and components</li>
+                    <li>Pods, Deployments, and Services</li>
+                    <li>ConfigMaps and Secrets</li>
+                    <li>Deploying applications to Kubernetes</li>
+                </ul>
+
+                <div class="topic-card" style="margin-top: 1rem;">
+                    <p><strong>Prerequisite:</strong> Docker containers are the building blocks for Kubernetes workloads</p>
+                </div>
+            </section>
+
+            <!-- Thank You -->
+            <section class="center">
+                <h1>Questions?</h1>
+                <p style="margin-top: 2rem; color: var(--docker-gray);">Docker Containerization - Day 1</p>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: true,
+            plugins: [ RevealNotes, RevealHighlight ]
+        });
+    </script>
+</body>
+</html>
