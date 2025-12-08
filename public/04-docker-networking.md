@@ -2,12 +2,12 @@
 
 ## A. Create and use a Docker network
 
-1. Create a custom bridge network. These are isolated on a single host.
+1. Create a custom bridge network. Bridge networks provide isolated networking on a single Docker host, with automatic DNS resolution between containers.
 ```
 docker network create --driver bridge mybridgenet
 ```
 
-2. Create two NGINX containeres on the **mybridgenet** network.
+2. Create two NGINX containers on the **mybridgenet** network.
 ```
 docker run -dit --name nginx1 --network mybridgenet nginx
 docker run -dit --name nginx2 --network mybridgenet nginx
@@ -20,8 +20,10 @@ docker network inspect mybridgenet
 
 4. Save the IP addresses of both containers.
 ```
-NGINX1_IP=`docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx1`
-NGINX2_IP=`docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx2`
+# Using $() syntax instead of backticks for better readability
+# The Go template extracts the IP address from the container's network settings
+NGINX1_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx1)
+NGINX2_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx2)
 ```
 ```
 echo "IP address of nginx1 is $NGINX1_IP"
@@ -46,7 +48,7 @@ docker network connect mybridgenet nginx3
 
 8. Save the IP address of the third container.
 ```
-NGINX3_IP=`docker inspect nginx3 -f '{{.NetworkSettings.Networks.mybridgenet.IPAddress}}'`
+NGINX3_IP=$(docker inspect nginx3 -f '{{.NetworkSettings.Networks.mybridgenet.IPAddress}}')
 echo $NGINX3_IP
 ```
 
@@ -86,7 +88,7 @@ docker run -d --name nginxpublic -p 8080:80 nginx
 curl http://localhost:8080
 ```
 
-> **Container linking** is a direct connection between two containers that may not be on the same network. We see this often when performing "lift and shifts" of legacy applications.
+> **Container linking** is a legacy feature that creates a direct connection between two containers. It's commonly seen in older applications but is deprecated in favor of user-defined networks with DNS resolution.
 
 3. Test container linking.
 ```
@@ -95,13 +97,13 @@ docker run -d --name linkednginx --link nginxpublic:nginxpub nginx
 
 4. Verify connectivity between the two linked containers.
 ```
-NGINXPUB_IP=`docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginxpublic`
+NGINXPUB_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginxpublic)
 ```
 ```
 docker exec linkednginx curl http://$NGINXPUB_IP
 ```
 
-> Docker swarm has a concept called **overlay networks** for communication between Docker nodes. This only becomes truly useful when you are managing a cluster of Docker daemons on multiple hosts, but we can practice a couple of commands here.
+> Docker Swarm uses **overlay networks** to enable communication between containers running on different Docker hosts. An overlay network creates a distributed network among multiple Docker daemon hosts, abstracting away the underlying network infrastructure.
 
 
 5. Initialize Docker swarm.
@@ -111,6 +113,7 @@ docker swarm init
 
 6. Create an overlay network.
 ```
+# -d overlay specifies the overlay driver for multi-host networking
 docker network create -d overlay myoverlaynet
 ```
 
@@ -125,7 +128,7 @@ By deploying a service to an overlay network, it can communicate across multiple
 8. Clean up resources.
 
 ```
-docker service rm mywebervice
+docker service rm mywebservice
 docker container stop linkednginx nginxpublic
 docker container rm linkednginx nginxpublic
 docker network rm myoverlaynet

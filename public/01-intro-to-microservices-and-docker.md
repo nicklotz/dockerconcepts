@@ -27,10 +27,11 @@ graph TD
 ```
 
 - Importance of the cloud and **stateless** applications
-  - State and logic are decoupled
-  - Horizontal scaling, traffic routed to any available instance
-  - Elasticity due to swings in demand
-  - Multi-region deployments don't have to sync session data
+  - **Stateless** means the application doesn't store user session data locally - each request is independent
+  - State and logic are decoupled - data is stored externally (databases, caches)
+  - Horizontal scaling: traffic can be routed to any available instance since they're identical
+  - Elasticity: easily handle swings in demand by adding/removing instances
+  - Multi-region deployments don't have to sync session data across instances
 
 - Core components of being **"cloud-native"**
   - Microservices
@@ -42,7 +43,7 @@ graph TD
 - **Infrastructure-as-code (IaC)** plays a starring role
  - Reproducable, ideally declarative, text-based configurations of what your deployments and infrastructure look like
  - Used for **provisioning**, i.e. creating the infrastructure needed to host your app
- - Used for **coniguring**, i.e. managing the supporting software and settings inside the infrastructure
+ - Used for **configuring**, i.e. managing the supporting software and settings inside the infrastructure
  - IaC means can take software development model approach, with code reviews, testing, and PRs
 
 ## B. Intro to Docker
@@ -154,11 +155,14 @@ docker ps -a
 cat docker-compose.yml
 ```
 
-> If the the container that manages the voting page for whatever reason went offline, can people still view the results of the vote? What does this say about the advantages of microservices?
+> **Discussion Question:** If the container that manages the voting page goes offline, can people still view the results of the vote? (Hint: The results service is independent from the voting service.) What does this demonstrate about the advantages of microservices architecture?
 
 8. Stop the container that manages the voting page.
 
 ```
+# This command finds the container ID using --filter and stops it
+# $(docker ps -q ...) returns the container ID
+# --filter ancestor=IMAGE filters by the image used to create the container
 docker stop $(docker ps -q --filter ancestor=example-voting-app-vote)
 ```
 
@@ -174,7 +178,9 @@ curl http://localhost:8080
 curl http://localhost:8081
 ```
 
-12. Clean up deployment.
+> The results page should still work even though the voting page is down. This demonstrates **service isolation** - a key benefit of microservices.
+
+11. Clean up deployment.
 
 ```
 docker compose down

@@ -27,6 +27,8 @@ docker image list
 
 5. Store the local Ubuntu image ID as an environment variable.
 ```
+# The --format flag uses Go templating to extract just the image ID
+# {{.ID}} outputs only the ID field from the image listing
 IMAGE_ID=$(docker images ubuntu:latest --format "{{.ID}}")
 ```
 
@@ -62,7 +64,7 @@ docker history ubuntu
 docker history example-voting-app-vote
 ```
 
-> Why do you see "missing" as the image ID for most of the layers? *Hint*: how changeable are images once they are pushed to a public registry?
+> Why do you see "missing" as the image ID for most of the layers? This is because Docker only stores layer IDs for images built locally. Layers pulled from a registry show as "missing" because they were built elsewhere. Images are **immutable** once pushed to a registry - the layers cannot be changed.
 
 4. Run an Ubuntu container instance and launch a process inside the container.
 ```
@@ -93,6 +95,8 @@ docker exec -it testcontainer touch /file2
 
 3. Save and tag the modified container as a new image.
 ```
+# docker commit creates a new image from a container's changes
+# This adds a new layer on top of the base image containing /file2
 docker commit testcontainer testimage:v2
 ```
 
@@ -111,7 +115,7 @@ docker run -dit --name testcontainerv2 testimage:v2
 docker exec -it testcontainerv2 ls
 ```
 
-> Do the filesystem contents match that of the saved image?
+> Do the filesystem contents match that of the saved image? Yes - you should see both `/file1` and `/file2` because the committed image captured all filesystem changes from the original container.
 
 7. Stop the container.
 ```
@@ -135,8 +139,11 @@ cd mynginx/
 cat << EOF > Dockerfile
 # Dockerfile
 FROM ubuntu
+# Combine apt-get update and install in one RUN to reduce layers
+# Using && ensures both commands succeed; -y auto-confirms prompts
 RUN apt-get update && apt-get install -y nginx
 COPY . /usr/share/nginx/html
+# Run nginx in foreground (daemon off) so container doesn't exit
 CMD ["nginx", "-g", "daemon off;"]
 EOF
 ```
@@ -223,14 +230,14 @@ https://hub.docker.com
 
 5. Under **Access Token Description**, enter a description of your choice. Give the token **Read, Write, and Delete** permissions, then click **Generate**.
 
-6. In the window showing the generated credential, click **Copy and Close** to copy the token to your clipboard. Paste the token in a safe pace you can refer back to.
+6. In the window showing the generated credential, click **Copy and Close** to copy the token to your clipboard. Paste the token in a safe place you can refer back to.
 
 7. Back in your terminal, run the following to create an environment variable for your Docker username. 
 ```
 read -p "Enter your name [Richard]: " MY_DOCKER_USERNAME
 ```
 
-8. Authneticate to Docker Hub.
+8. Authenticate to Docker Hub.
 ```
 docker login
 ```

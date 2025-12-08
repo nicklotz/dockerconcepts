@@ -2,7 +2,7 @@
 
 ## A. Isolation
 
-> By default, multiple containers created from the same image are isolated from each other. Let's prove this.
+> **Container isolation** means that each container has its own filesystem, process space, and network stack. Multiple containers created from the same image are completely isolated from each other by default. Let's prove this.
 
 1. Launch two separate containers from the same Ubuntu image.
 ```
@@ -39,7 +39,7 @@ docker exec -it container2 bash -c "cat /isolated_file.txt"
 
 ## B. Port Mapping
 
-> Docker container also by default run on networks networks separate from the underlying host.
+> Docker containers by default run on networks separate from the underlying host.
 
 1. Create a web service container from an NGINX image. 
 ```
@@ -95,7 +95,7 @@ docker stop webserver0
 docker rm webserver0
 ```
 
-# C. Environment Variables
+## C. Environment Variables
 
 > Docker supports environment variables that can be defined in the application code and in the Dockerfile itself. Let's practice with a simple Flask app.
 
@@ -217,6 +217,8 @@ docker run -d --name datatest1 -v datavolume:/app nginx
 
 4. Write data to the container's **/app** directory.
 ```
+# The -c flag passes the command string to bash
+# The > redirect writes the echo output to a file inside the container's mounted volume
 docker exec -it datatest1 bash -c "echo 'Test write of persistent data' > /app/test.txt"
 ```
 
@@ -251,7 +253,14 @@ docker volume rm datavolume
 
 ## E. Restart Policies
 
-> Docker supports **restart policies** to manage the automatic restarting of containers. These policies dictate how Docker should handle scenarios, like crashes, system reboots, or manual stops. The available policies include **no**, **always**, **unless-stopped**, and **on-failure**.
+> Docker supports **restart policies** to manage the automatic restarting of containers. These policies dictate how Docker should handle scenarios like crashes, system reboots, or manual stops.
+
+| **Policy** | **Behavior** |
+|------------|--------------|
+| `no` | Never restart the container (default) |
+| `always` | Always restart, even after daemon restart |
+| `unless-stopped` | Restart unless manually stopped |
+| `on-failure` | Restart only on non-zero exit code |
 
 1. Create and change into a new directory to hold an application and its Dockerfile.
 ```
@@ -298,6 +307,9 @@ docker run -d --restart=no --name norestartapp crashapp
 
 6. Observe the restart behavior, or lack thereof.
 ```
+# 'watch' repeatedly runs a command (every 2 seconds by default)
+# -f name= filters containers by name
+# Press Ctrl+C to exit watch
 watch docker ps -a -f name=norestartapp
 ```
 
@@ -348,7 +360,7 @@ docker stop alwaysrestartapp
 docker rm alwaysrestartapp
 ```
 
-13. Re-run **crashap**, this time with an **on-failure** restart policy.
+13. Re-run **crashapp**, this time with an **on-failure** restart policy.
 ```
 docker run -d --restart=on-failure --name onfailureapp crashapp
 ```
