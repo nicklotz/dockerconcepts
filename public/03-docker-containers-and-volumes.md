@@ -30,9 +30,9 @@ docker top container2
 docker exec -it container1 bash -c "echo 'Hello from Container1' > /isolated_file.txt"
 ```
 
-4. Check of the file exists in **container2**.
+4. Check if the file exists in **container2**.
 ```
-docker exec -it container2 bash -c "cat /isolation_test.txt"
+docker exec -it container2 bash -c "cat /isolated_file.txt"
 ```
 
 > It is shown that, absent any shared storage, containers from the same image do not share filesystem resources.
