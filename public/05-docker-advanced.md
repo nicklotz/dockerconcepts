@@ -21,7 +21,7 @@ sudo systemctl disable --now docker.service docker.socket
 sudo reboot
 ```
 
-4. After reboot, install Docker rootless. Follow the instructions provided by the installation if you are missing any dependencies such as **uidmap**.
+4. After reboot, install Docker rootless. Follow the instructions provided by the installation if you are missing any dependencies such as **uidmap** or need to restart services. You might need to rerun the installer a couple times, following the instructions after each time.
 ```
 curl -fsSL https://get.docker.com/rootless | sh
 ```
