@@ -6,6 +6,19 @@
 
 > **NOTE:** The example commands shown here are intended for a Linux system. Docker Desktop and Rancher on Mac systems run Docker within a virtual machine on the host.
 
+### Prerequisites (Ubuntu 22.04 LTS)
+
+Before setting up rootless Docker, install the required dependency:
+
+```
+# Install uidmap (provides newuidmap/newgidmap for user namespace mapping)
+sudo apt-get update && sudo apt-get -y install uidmap
+```
+
+> **Note for Ubuntu 23.10+:** Newer Ubuntu versions require additional AppArmor configuration for rootlesskit. See the [Docker rootless documentation](https://docs.docker.com/engine/security/rootless/) for details.
+
+### Setup Steps
+
 1. Stop the docker daemon.
 ```
 systemctl stop docker
@@ -30,7 +43,20 @@ sudo reboot
 curl -fsSL https://get.docker.com/rootless | sh
 ```
 
-> If needed, follow the instructions at the end of the installation such as updating your **$PATH**.
+> After installation completes, you must configure your environment. Add the following to your `~/.bashrc`:
+
+```
+# Add rootless Docker binaries to PATH
+export PATH=/home/$USER/bin:$PATH
+
+# Point Docker CLI to the rootless daemon socket
+export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
+```
+
+```
+# Apply the changes to your current session
+source ~/.bashrc
+```
 
 5. After installation, show the available Docker contexts.
 ```
@@ -48,12 +74,13 @@ docker context show
 
 7. Run a container in rootless mode.
 ```
+# --rm removes the container after it exits
 # --user specifies the UID:GID to run as inside the container
 # $UID is your user ID, $(id -g $USER) gets your group ID
-docker run --user $UID:$(id -g $USER) -it ubuntu whoami
+docker run --rm --user $UID:$(id -g $USER) ubuntu whoami
 ```
 
-> What user does the **whoami** command output? It should show a numeric UID rather than "root", demonstrating the container is not running as the root user.
+> What user does the **whoami** command output? It should show your username (e.g., "ubuntu") or a numeric UID - but NOT "root". This demonstrates the container process is running as a non-root user. Without the `--user` flag, containers default to running as root inside the container.
 
 8. Switch the Docker context back to default.
 ```
