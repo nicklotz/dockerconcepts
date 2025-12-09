@@ -244,7 +244,7 @@ EOF
 ### Scan During Build
 ```
 # Example: Hadolint for Dockerfile linting
-docker run --rm -i hadolint/hadolint < Dockerfile
+docker run --rm -i hadolint/hadolint < Dockerfile.secure #or Dockerfile.multistage
 ```
 
 ## E. Using .dockerignore
