@@ -2,7 +2,7 @@
 
 ## A. Building a CI Pipeline for Docker Images
 
-> A CI pipeline for Docker typically includes: building images, running tests, scanning for vulnerabilities, and pushing to a registry.
+> A CI pipeline for Docker typically chains four stages: **test** (unit and integration tests against the source), **build** (assemble the image), **scan** (check for known vulnerabilities), and **push** (publish to a registry). The whole point of running them in this order — gated by `needs:` in GitHub Actions, `requires:` in CircleCI, or `dependencies:` in GitLab — is to prevent broken or vulnerable images from ever reaching the registry. If `scan` finds a critical CVE, `push` never runs.
 
 ### GitHub Actions CI Pipeline Example
 
@@ -145,7 +145,7 @@ EOF
 
 ## B. Security Scanning with Trivy
 
-> Trivy is a comprehensive security scanner for containers. It detects vulnerabilities in OS packages and application dependencies.
+> **Trivy** is an open-source vulnerability scanner that compares the packages installed in your image against public **CVE databases** (NVD, vendor advisories, GitHub's database, and others) — those databases list every publicly-disclosed vulnerability with a severity rating. Running Trivy in CI lets you catch a vulnerable dependency *before* it reaches production, rather than discovering it from a Slack alert at 3 AM. The `--exit-code 1` flag is what turns Trivy into a **CI gate**: a non-zero exit fails the job, which (via `needs:`) blocks the push step.
 
 1. Install Trivy (if not using GitHub Actions).
 ```
@@ -177,7 +177,7 @@ trivy image --exit-code 1 --severity CRITICAL nginx:latest
 
 ## C. Docker Scout for Vulnerability Detection
 
-> Docker Scout is Docker's native security scanning tool integrated into Docker Desktop and CLI.
+> **Docker Scout** is Docker's first-party scanner, integrated directly into Docker Desktop and the CLI. Functionally it overlaps with Trivy: both query CVE databases against your image's package list. The practical difference is ecosystem — Scout is convenient if you're already on Docker Desktop, while Trivy is the de-facto open-source standard and works equally well outside it (in CI, against non-Docker registries, against filesystems and Kubernetes manifests). Most teams pick one; some run both for defense in depth.
 
 1. Enable Docker Scout (Docker Desktop users).
 ```
@@ -195,6 +195,8 @@ docker scout compare nginx:latest nginx:1.24-alpine
 ```
 
 ## D. Dockerfile Security Best Practices
+
+> Three of the highest-leverage hardening practices: **pin specific base image versions** (so a `latest` tag floating to a compromised build can't poison your image overnight), **run as a non-root user** (so a process escape doesn't immediately get container-root capabilities), and **use multi-stage builds** (so the build toolchain and source code don't ship to production along with the binary). The examples below show each.
 
 ### Use Specific Base Image Versions
 ```
@@ -249,7 +251,7 @@ docker run --rm -i hadolint/hadolint < Dockerfile.secure #or Dockerfile.multista
 
 ## E. Using .dockerignore
 
-> Prevent sensitive files from being included in the image.
+> The `.dockerignore` file does for `docker build` what `.gitignore` does for `git`: it excludes files from the **build context** sent to the Docker daemon. There are two reasons to care. First, **secrets hygiene** — keep `.env`, credentials, and key files out of the image entirely, since image layers are recoverable forever. Second, **build speed** — smaller contexts upload faster, and excluding `node_modules` or `__pycache__` can cut a multi-gigabyte transfer to a few megabytes.
 
 1. Create a .dockerignore file.
 ```
@@ -285,7 +287,7 @@ EOF
 
 ## F. Secrets Management in Docker
 
-> Never store secrets in Docker images. Use runtime secrets instead.
+> The cardinal rule: **never bake secrets into image layers**. Layers are content-addressed and cached — once a secret is in a layer, it's recoverable from the image even if a later `RUN rm` "deletes" it, and anyone who pulls the image gets a copy. The patterns below show three safer alternatives: Docker Swarm secrets (mounted as files under `/run/secrets/...` at runtime), runtime environment variables, and **BuildKit build secrets** (which mount a secret into a single `RUN` step without persisting it to any layer).
 
 ### Using Docker Secrets (Swarm Mode)
 ```
@@ -317,7 +319,7 @@ docker build --secret id=pip_token,src=./pip_token.txt -t myapp .
 
 ## G. Image Signing and Verification
 
-> Docker Content Trust enables image signing and verification.
+> Image signing answers the question, "is this image actually the one the maintainer published, or was it tampered with along the way?" **Docker Content Trust** (DCT) is Docker's original implementation, based on Notary v1. Most modern signing workflows have moved to **Sigstore / cosign**, which integrates with OIDC identities and a public transparency log (Rekor) — but DCT is still supported and is what's wired into the `docker push` command directly, so it remains a useful reference point.
 
 1. Enable Docker Content Trust.
 ```

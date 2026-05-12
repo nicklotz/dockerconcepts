@@ -16,6 +16,8 @@
 
 ## B. Docker Compose Basics
 
+> A `docker-compose.yml` file is a declarative description of a multi-container app. The top-level **services** key lists each container, and each service entry is roughly equivalent to a `docker run` invocation — only with the flags spread across structured fields (`build`, `image`, `ports`, `environment`, `depends_on`). When you `docker compose up`, Compose also creates a default network and attaches every service to it, and crucially uses each service's **name** as its DNS hostname on that network. That's how `web` will reach `redis` in the example below without any IP addresses or port mappings between them.
+
 1. Verify Docker Compose is installed.
 ```
 docker compose version
@@ -105,6 +107,8 @@ curl http://localhost:5000
 
 > Each request should increment the counter, demonstrating that the Flask app is communicating with Redis.
 
+> Notice that `app.py` connects to Redis using the literal hostname `redis` (set via `REDIS_HOST` in the compose file). It works because Compose attached both containers to a default network and used the service names as DNS names. There's no port mapping for Redis in `docker-compose.yml` and there doesn't need to be — `web` reaches it over the internal network, not through the host.
+
 10. View the logs from all services.
 ```
 docker compose logs
@@ -117,7 +121,7 @@ docker compose down
 
 ## C. Working with Databases in Development
 
-> Docker Compose is excellent for running databases alongside your application during development.
+> Docker Compose is excellent for running databases alongside your application during development — a fresh, isolated database per project, brought up and torn down with one command. The interesting bit in the example below is the **`depends_on` + `condition: service_healthy`** combination. Plain `depends_on` only waits for a container to *start*; it doesn't wait for the service inside to actually accept connections. Web apps that fail with "connection refused" right at startup are usually missing exactly this. The `healthcheck` block plus the `service_healthy` condition gates `web`'s startup on a real readiness probe (`pg_isready`) instead.
 
 1. Create a new project directory.
 ```
@@ -234,7 +238,7 @@ docker compose down -v
 
 ## D. Using .env Files
 
-> Environment files allow you to externalize configuration without modifying the compose file.
+> Compose handles environment variables in two distinct (and easy-to-confuse) ways. **Variable substitution** uses `${VAR}` syntax inside `docker-compose.yml` itself, with values pulled from a local `.env` file or your shell — these get substituted *before* the compose file is parsed. **Container environment variables** (the `environment:` key in a service) are passed *into* the running container at runtime. The example below uses both: `${APP_PORT}` is substituted into the port mapping by Compose at parse time, while `DEBUG=${DEBUG}` is passed as an environment variable that the app inside the container can read.
 
 1. Create a new directory.
 ```
@@ -284,7 +288,7 @@ docker compose down
 
 ## E. Development vs Production Configurations
 
-> Docker Compose supports multiple configuration files for different environments.
+> A common pattern is to keep one **base** `docker-compose.yml` with the shared service definitions and add **override files** (`docker-compose.dev.yml`, `docker-compose.prod.yml`) that layer environment-specific changes on top. When you pass multiple `-f` flags, Compose merges the files in order, with later files overriding earlier ones field by field. This avoids duplicating the entire compose file just to change a few environment variables, volume mounts, or replica counts.
 
 1. Create a base compose file.
 ```

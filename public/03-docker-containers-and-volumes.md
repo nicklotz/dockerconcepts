@@ -2,7 +2,7 @@
 
 ## A. Isolation
 
-> **Container isolation** means that each container has its own filesystem, process space, and network stack. Multiple containers created from the same image are completely isolated from each other by default. Let's prove this.
+> **Container isolation** means that each container has its own filesystem, process space, and network stack. Underneath, the Linux kernel provides this via **namespaces** — mount, PID, network, and others — that wall off each container's view of the system. Multiple containers created from the same image are completely isolated from each other by default. Let's prove this.
 
 1. Launch two separate containers from the same Ubuntu image.
 ```
@@ -39,7 +39,7 @@ docker exec -it container2 bash -c "cat /isolated_file.txt"
 
 ## B. Port Mapping
 
-> Docker containers by default run on networks separate from the underlying host.
+> Docker containers by default attach to a **bridge network** with addresses in the `172.x.x.x` range. Those addresses are reachable from the Docker host but not from anything outside it — fine for container-to-container traffic, but a problem the moment you want a browser or another machine to reach the service. **Port mapping** (`-p`) is the answer: Docker adds an iptables / userland-proxy rule that forwards a port on the host's interface to a port inside the container.
 
 1. Create a web service container from an NGINX image. 
 ```
@@ -97,7 +97,7 @@ docker rm webserver0
 
 ## C. Environment Variables
 
-> Docker supports environment variables that can be defined in the application code and in the Dockerfile itself. Let's practice with a simple Flask app.
+> Docker supports environment variables defined in the application code, baked into the Dockerfile, or passed in at run time. The last form is the most flexible: it follows the **12-factor app** principle of keeping configuration separate from code, so the same image can deploy to different environments by changing only the variables passed at startup. Let's practice with a simple Flask app.
 
 1. Create a directory to hold a Python web app and accompanying Dockerfile.
 ```
@@ -198,7 +198,7 @@ docker rm myenvvarapp
 
 ## D. Volumes
 
-> Docker volumes allow Docker to manage and store persistent data. They allow data to persist beyond the lifecycle of a single container, and can be even shared between containers. Docker volumes are essential for storing non-ephemeral data.
+> By default, anything written inside a container disappears when the container is removed — that writable layer is ephemeral, which is fine for most application state but disastrous for databases, caches, or user uploads. **Volumes** are how containers opt into persistence. The *named volume* used in this section is managed entirely by Docker and stored under `/var/lib/docker/volumes`; a *bind mount* (covered elsewhere) would instead reach into a specific path on the host filesystem. Volumes can also be shared between containers, which we'll demonstrate.
 
 1. Create a Docker volume to store persistent data.
 ```
@@ -382,6 +382,8 @@ docker stop onfailureapp
 ```
 docker rm onfailureapp
 ```
+
+> **`unless-stopped`** looks similar to `always` but with one important difference: it respects a manual `docker stop`. A container stopped that way stays stopped even after the Docker daemon restarts — whereas `always` would bring it back. That's the behavior the next set of steps demonstrates.
 
 17. Run a healhty app, this time with an **unless-stopped** restart policy.
 ```
