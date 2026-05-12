@@ -2,6 +2,8 @@
 
 ## A. Image Immutability
 
+> A core property of a Docker image: once built, the filesystem it contains is fixed. When you run a container, you get a thin **writable layer** on top of those read-only image layers — anything you write there belongs to the container, not the image. The next steps prove this by writing a file inside one container and then starting a fresh container from the same image to look for it.
+
 1. Pull an Ubuntu Linux image and connect to a shell session inside it.
 ```
 cd ~
@@ -47,7 +49,11 @@ ls
 exit
 ```
 
+> The second container started clean — `/file1` lived only in the writable layer of **testcontainer**, which was discarded when that container exited. The image itself was never modified, so any container launched from it always begins from the same state. This is what people mean when they say containers are *reproducible*.
+
 ## B. Layers and Processes
+
+> Docker images are built as a **stack of read-only layers**, each capturing the filesystem changes from one build instruction. When a container starts, Docker mounts those layers together with a writable layer on top, using a *union filesystem*. The same base layer is shared by every image and container that uses it — that's why a hundred Ubuntu containers don't consume a hundred times the disk of one.
 
 1. Explore the layers in the **hello-world** image.
 ```
@@ -82,6 +88,8 @@ docker stop singleprocesscontainer
 ```
 
 ## C. Build From an Existing Container
+
+> `docker commit` snapshots a running container's filesystem into a new image. It's useful for ad-hoc experimentation — "save what I have right now" — but it's a poor fit for production. The resulting image is opaque: there's no record of what was installed, in what order, or from what source. Dockerfiles (Section D) solve that problem by making the build steps explicit and reproducible.
 
 1. Restart the Ubuntu **testcontainer**.
 ```
@@ -124,6 +132,8 @@ docker stop testcontainerv2
 
 ## D. Building From Dockerfile
 
+> A **Dockerfile** is a text recipe for building an image. `FROM` declares the base image; `RUN` executes a command and commits the result as a new layer; `COPY` brings files from the build context into the image; `CMD` sets the default command for containers started from the image. Because each instruction creates a layer, ordering matters for **caching** — put rarely-changing instructions (package installs) above frequently-changing ones (your source code), so an edit to your code doesn't invalidate the install layer.
+
 1. Create a local directory to hold a container build configuration.
 ```
 mkdir mynginx/
@@ -164,6 +174,8 @@ docker image inspect mynginx
 ```
 
 ## E. Multi-Stage Builds
+
+> A **multi-stage build** uses multiple `FROM` instructions in one Dockerfile. Each `FROM` starts a fresh image, and you can `COPY --from=<stage>` to selectively pull artifacts out of an earlier stage. The win is that the final image ships only the compiled output, not the toolchain that built it — that shrinks the image, speeds pulls, and removes a class of attack surface (no `gcc` lying around for an intruder to misuse).
 
 1. Create a new directory to hold the configuration for a simple web app.
 ```
@@ -217,6 +229,8 @@ docker run mysimpleapp
 
 ## F. Docker Hub
 
+> A **registry** is where built images live and get distributed; Docker Hub is the default public one. Authenticating with an **access token** rather than your account password is the standard practice: tokens are scoped (e.g., read-only vs. push-and-delete), individually revocable, and don't expose the credentials you use to log into the web UI.
+
 1. Navigate to Docker Hub in your web browser.
 ```
 https://hub.docker.com
@@ -268,6 +282,8 @@ docker push $MY_DOCKER_USERNAME/mysimpleapp:0.0.1
 > Do the image layers resemble the image you pushed?
 
 ## G. Clean Up
+
+> `docker image prune` removes **dangling** images — image layers no longer referenced by a tag, usually leftovers from rebuilds. `docker system prune` goes further, removing stopped containers, unused networks, and the build cache as well. Routine cleanup keeps disk usage in check on a development machine.
 
 Run the following to clean up unused images and containers. Enter `y` if prompted.
 

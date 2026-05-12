@@ -2,6 +2,8 @@
 
 ## A. Create and use a Docker network
 
+> Docker exposes several **network drivers**: `bridge` (default — isolates containers on a single host), `host` (the container shares the host's network stack), `none` (no networking at all), and `overlay` (multi-host, covered in Section B). A *custom* bridge network like the one we're about to create has one practical advantage over the built-in `bridge`: containers attached to it can resolve each other's names via Docker's embedded DNS server, not just by IP.
+
 1. Create a custom bridge network. Bridge networks provide isolated networking on a single Docker host, with automatic DNS resolution between containers.
 ```
 docker network create --driver bridge mybridgenet
@@ -35,6 +37,8 @@ echo "IP address of nginx2 is $NGINX2_IP"
 docker exec nginx1 curl http://$NGINX2_IP
 docker exec nginx2 curl http://$NGINX1_IP
 ```
+
+> Because **mybridgenet** is a custom bridge with embedded DNS, we could just as well have written `docker exec nginx1 curl http://nginx2` — the service name resolves to the right IP automatically. The default `bridge` network does not offer this; on that network you'd be stuck passing IPs around (or using the deprecated `--link` flag).
 
 6. Create a container **not** yet connected to your custom network.
 ```
@@ -78,6 +82,8 @@ docker network rm mybridgenet
 
 ## B. Expose and link containers
 
+> So far the containers we've created have only been reachable from inside Docker's networks. **Publishing a port** (`-p host:container`) is the standard way to expose a service to the host machine — and through the host to the outside world. **Container linking** (`--link`), explored second, is an older mechanism that predates user-defined networks: it injects environment variables and `/etc/hosts` entries into the linked container. It still works but has been deprecated, because user-defined bridge networks (Section A) cover the same use case more cleanly.
+
 1. Run a new NGINX container with port 80 exposed to port 8080 on localhost.
 ```
 docker run -d --name nginxpublic -p 8080:80 nginx
@@ -103,7 +109,7 @@ NGINXPUB_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}
 docker exec linkednginx curl http://$NGINXPUB_IP
 ```
 
-> Docker Swarm uses **overlay networks** to enable communication between containers running on different Docker hosts. An overlay network creates a distributed network among multiple Docker daemon hosts, abstracting away the underlying network infrastructure.
+> So far every container has lived on a single Docker host. **Overlay networks** are how containers communicate when they're spread across multiple hosts. They require a control plane that tracks which container is on which host — which is why this section starts by initializing Docker Swarm: even with a single node, swarm mode is what enables the overlay driver. (Kubernetes solves the same problem with its own CNI plugins, but the underlying primitives are similar.)
 
 
 5. Initialize Docker swarm.

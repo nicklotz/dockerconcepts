@@ -63,7 +63,7 @@ source ~/.bashrc
 docker context ls
 ```
 
-> Note the presence of the default (root-based) as well as rootless contexts.
+> A Docker **context** is a named connection target for the CLI — a (daemon socket, TLS config) pair that the `docker` command knows how to talk to. The listing here should show both the **default** root-based context and the new **rootless** one. Switching context is how you change which daemon a `docker` command operates against, without restarting anything.
 
 6. Show the currently used context.
 ```
@@ -116,7 +116,7 @@ docker build -f Dockerfile.slim -t node-slim .
 docker images | grep node-
 ```
 
-> The slim image should be significantly smaller. This demonstrates the trade-off: slim images save space but may be missing tools you need for debugging.
+> The slim image should be significantly smaller. There's a trade-off here: slim images strip out common debugging tools (`curl`, `vim`, sometimes even most of a shell), so when something breaks in production you may not have your usual diagnostic kit available. For even smaller images, look at **Alpine** (5–10MB base, swaps glibc for musl) or **distroless** images from Google (no shell at all — just your binary and its runtime). Each step down trades convenience for less storage cost, faster pulls, and a smaller attack surface.
 
 4. Clean up.
 ```
