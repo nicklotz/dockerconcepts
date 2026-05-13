@@ -149,7 +149,7 @@ EOF
 
 1. Install Trivy (if not using GitHub Actions).
 ```
-curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
 ```
 
 2. Scan a local Docker image.
