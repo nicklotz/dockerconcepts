@@ -175,11 +175,15 @@ trivy image --exit-code 1 --severity CRITICAL nginx:latest
 
 > A non-zero exit code indicates vulnerabilities were found, useful for CI/CD pipeline gates.
 
-## C. Docker Scout for Vulnerability Detection
+## C. (OPTIONAL: REQUIRES DOCKER CLOUD LOGIN) - Docker Scout for Vulnerability Detection
 
 > **Docker Scout** is Docker's first-party scanner, integrated directly into Docker Desktop and the CLI. Functionally it overlaps with Trivy: both query CVE databases against your image's package list. The practical difference is ecosystem — Scout is convenient if you're already on Docker Desktop, while Trivy is the de-facto open-source standard and works equally well outside it (in CI, against non-Docker registries, against filesystems and Kubernetes manifests). Most teams pick one; some run both for defense in depth.
 
-1. Enable Docker Scout (Docker Desktop users).
+1. Install and enable Docker Scout (Docker Desktop users).
+```
+curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh -o install-scout.sh
+sh install-scout.sh
+```
 ```
 docker scout quickview nginx:latest
 ```
