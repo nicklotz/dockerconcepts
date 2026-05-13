@@ -294,34 +294,18 @@ EOF
 > The cardinal rule: **never bake secrets into image layers**. Layers are content-addressed and cached — once a secret is in a layer, it's recoverable from the image even if a later `RUN rm` "deletes" it, and anyone who pulls the image gets a copy. The patterns below show three safer alternatives: Docker Swarm secrets (mounted as files under `/run/secrets/...` at runtime), runtime environment variables, and **BuildKit build secrets** (which mount a secret into a single `RUN` step without persisting it to any layer).
 
 ### Using Docker Secrets (Swarm Mode)
+1. Initialize docker swarm
+```
+docker swarm init
+```
+
+3. Create a secret
 ```
 # Create a secret
 echo "mysecretpassword" | docker secret create db_password -
-
-# Use in a service
-docker service create --secret db_password myapp
 ```
 
-### Using Environment Variables at Runtime
-```
-# Pass secrets at runtime, not build time
-docker run -e DB_PASSWORD="$DB_PASSWORD" myapp
-```
-
-### Using Docker BuildKit Secrets (Build Time)
-```
-cat << EOF > Dockerfile.buildsecret
-FROM python:3.9-slim
-RUN --mount=type=secret,id=pip_token \
-    pip install --index-url https://\$(cat /run/secrets/pip_token)@pypi.example.com/simple/ mypackage
-EOF
-```
-```
-# Build with secret
-docker build --secret id=pip_token,src=./pip_token.txt -t myapp .
-```
-
-## G. Image Signing and Verification
+## G. (REFERENCE-ONLY): Image Signing and Verification
 
 > Image signing answers the question, "is this image actually the one the maintainer published, or was it tampered with along the way?" **Docker Content Trust** (DCT) is Docker's original implementation, based on Notary v1. Most modern signing workflows have moved to **Sigstore / cosign**, which integrates with OIDC identities and a public transparency log (Rekor) — but DCT is still supported and is what's wired into the `docker push` command directly, so it remains a useful reference point.
 
